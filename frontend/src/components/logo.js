@@ -25,8 +25,8 @@ const LogoImg = styled.img`
   ${({ small }) =>
     small &&
     css`
-      width: 4.8em;
-      height: 4.8em;
+      width: 6em;
+      height: 5em;
     `};
 `;
 

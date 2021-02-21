@@ -21,7 +21,7 @@ export function TopSection(props) {
                     <Logo />
                     <Margin direction="vertical" margin="4em" />
                     <h1 className = "bigText"> Project Jensen </h1>
-                    <h1 className = "bigText"> the Future of teaching software </h1>
+                    <h1 className = "bigText"> the future of teaching software </h1>
                     <Margin direction="vertical" margin="4em" />
                     <Button>Better Teaching now.</Button>
                     <div className = "downArrowContainer" onClick={scrollToNextSection}>

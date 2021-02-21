@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { TopSection } from "./topSection";
 import { Margin } from "../components/margin";
 import { ServicesSection } from "./servicesSection";
+import { Footer } from "../components/footer";
 
 const PageContainer = styled.div`
   width: 100%;
@@ -18,6 +19,7 @@ export function Homepage(props) {
         <ServicesSection />
         <Margin direction="vertical" margin="2em" />
         <Margin direction="vertical" margin="8em" />
+        <Footer />
       </PageContainer>
     );
   }

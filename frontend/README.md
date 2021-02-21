@@ -6,7 +6,9 @@ npm install react-scroll
 npm i --save @fortawesome/free-solid-svg-icons
 npm install @fortawesome/fontawesome-svg-core
 npm install @fortawesome/react-fontawesome
+npm install @fortawesome/free-brands-svg-icons
 
+npm start
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
