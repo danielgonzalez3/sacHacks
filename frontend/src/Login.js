@@ -19,6 +19,7 @@ export default function Login() {
         <div className = "image" >
             <div className="Login">
                 <div className="centerLogin">
+                    <div className="box">
                     <Form onSubmit={handleSubmit}>
                         <Form.Group size="lg" controlId="email">
                             <Form.Label>Email</Form.Label>
@@ -41,6 +42,7 @@ export default function Login() {
                             Login
                         </Button>
                     </Form>
+                    </div>
                 </div>
             </div>
         </div>
