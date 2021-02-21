@@ -5,23 +5,31 @@ import "./login.css";
 import { LoginButton } from "./loginButton";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    {/* 
+        const [email, setEmail] = useState("");
+        const [password, setPassword] = useState("");
 
-    function validateForm() {
-        return email.length > 0 && password.length > 0;
-    }
+        function validateForm() {
+            return email.length > 0 && password.length > 0;
+        }
 
-    function handleSubmit(event) {
-        event.preventDefault();
-    }
+        function handleSubmit(event) {
+            event.preventDefault();
+        }
+    */}
+    
 
     return(
-        <div className = "image" >
+        <div className = "topImageContainer" >
+            <div className = "imageFilter"> 
+                <h1 className = "bigText"> Project Jensen </h1>
+                <h1 className = "bigText"> the Future of teaching software </h1>
+            </div>
+            {/*
             <div className="Login">
                 <div className="centerLogin">
                     <div className="box">
-                    {/* 
+ 
                     <Form onSubmit={handleSubmit}>
                         <Form.Group size="lg" controlId="email">
                             <Form.Label>Email</Form.Label>
@@ -41,10 +49,10 @@ export default function Login() {
                             />
                         </Form.Group>
                     </Form>
-                    */}
                     </div>
                 </div>
             </div>
+            */}
         </div>
     )
 }
