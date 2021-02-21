@@ -1,22 +1,29 @@
+#!/usr/bin/env python3
 ''' 
  macOS Catalina 10.15.6
  Zoom Version 5.5.2 
 '''
+import os, glob
 import json
 import datetime
 import time
-from zoomus import components, ZoomClient, util
-from datetime import date
 import subprocess
 import pyautogui
 import requests
 import http.client
 import pandas as pd
 import spacy
+from datetime import date
+from zoomus import components, ZoomClient, util
+import speech_recognition as sr
+from os import path
+from pydub import AudioSegment
+
 nlp = spacy.load('en_core_web_lg')
 
 client = ZoomClient('dD_Z1gcSQSSe588TyzTdJQ', 'sA77ty3FNTw4gOelV18PdEWdwbJynIxjJda6')
 meetingID = '6487365240'
+meetingPass = '9VryWd'
 
 SUBJECTS = {"nsubj", "nsubjpass", "csubj", "csubjpass", "agent", "expl"}
 OBJECTS = {"dobj", "dative", "attr", "oprd"}
@@ -25,24 +32,46 @@ NEGATIONS = {"no", "not", "n't", "never", "none"}
 
 
 def main():
+	print('\nStarting Project Jensen')
 	df = pd.DataFrame()
 	oldtime = time.time()
-	print('brrr')
-	while(1):
-		if time.time() - oldtime > 59:
-			print('doing the thing')
-			df = scrapeUsers(df)
-			oldtime = time.time()
-			df.to_csv('user_list_'+date.today().strftime("%d-%m-%Y")+'.csv')
-	
+	setup(meetingID, meetingPass)
+	try:
+		df = scrapeUsers(df)
+		print('Updating User List...')
+		while(1):
+			if time.time() - oldtime > 59:
+				print('Updating User List...')
+				oldtime = time.time()
+				df = scrapeUsers(df)
+	except:
+		pass
+		print('\nClosing Project Jensen')
+		df.to_csv('user_list_'+date.today().strftime("%d-%m-%Y")+'.csv')
+		print('\nSaving Output Data...')
+		time.sleep(2)
+		for root, dirs, files in os.walk("./"):
+		    for file in files:
+		        if file.endswith(".m4a"):
+		             audio_path = os.path.join(root, file)
+		             print(audio_path)
 
+
+
+	
 # Automate Zoom Deployment [Later On]
-def setup(id, pswd):
-	subprocess.call("usr/bin/open", "/Applications/zoom.us.app")
-	time.sleep(8)
-	join = pyautogui.locateCenterOnScreen('join_btn.png')
-	pyautogui.moveTo(join)
+def setup(id, pswd): 
+	# subprocess.call('C:\\myprogram.exe') [For Windows]
+	subprocess.call(["/usr/bin/open", "/Applications/zoom.us.app"]) 
+	time.sleep(3)
+	x1, y1 = pyautogui.locateCenterOnScreen('join_btn_lrg.png')
+	pyautogui.moveTo(x1-650, y1-340)
 	pyautogui.click()
+	pyautogui.write(id)
+	pyautogui.press('enter') 
+	time.sleep(3)
+	pyautogui.press('enter') 
+
 
 
 def scrapeUsers(df):
