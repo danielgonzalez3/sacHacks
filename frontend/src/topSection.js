@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { Element, scroller } from "react-scroll";
-import Form from "react-bootstrap/Form";
 import { Button } from "./components/button";
 import "./topSection.css";
-import { LoginButton } from "./loginButton";
 import { Navbar } from "./components/navBar";
 import { Margin } from "./components/margin";
 import { Logo } from "./components/logo";
 import { DownArrow } from "./components/downArrow";
-
-
 
 export function TopSection(props) {
     const scrollToNextSection = () => {
