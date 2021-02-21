@@ -3,6 +3,7 @@
  macOS Catalina 10.15.6
  Zoom Version 5.5.2 
 '''
+import speech_recognition as sr
 import os, glob
 import json
 import datetime
@@ -13,13 +14,13 @@ import requests
 import http.client
 import pandas as pd
 import spacy
-from datetime import date
+from collections.abc import Iterable
 from zoomus import components, ZoomClient, util
-import speech_recognition as sr
+from datetime import date
 from os import path
-from pydub import AudioSegment
+from igraph import *
 
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load("en_core_web_sm")
 
 client = ZoomClient('dD_Z1gcSQSSe588TyzTdJQ', 'sA77ty3FNTw4gOelV18PdEWdwbJynIxjJda6')
 meetingID = '6487365240'
@@ -32,7 +33,8 @@ NEGATIONS = {"no", "not", "n't", "never", "none"}
 
 
 def main():
-	print('\nStarting Project Jensen')
+	print('\nStarting Project Jensen\n')
+	
 	df = pd.DataFrame()
 	oldtime = time.time()
 	setup(meetingID, meetingPass)
@@ -46,7 +48,7 @@ def main():
 				df = scrapeUsers(df)
 	except:
 		pass
-		print('\nClosing Project Jensen')
+		print('\nClosing Project Jensen\n')
 		df.to_csv('user_list_'+date.today().strftime("%d-%m-%Y")+'.csv')
 		print('\nSaving Output Data...')
 		time.sleep(2)
@@ -55,21 +57,79 @@ def main():
 		        if file.endswith(".m4a"):
 		             audio_path = os.path.join(root, file)
 		             print(audio_path)
+	print("\nGenerating Graph...\n")   
+	g = Graph(directed=False)
+	df = pd.read_csv('output_list.csv', error_bad_lines=False, warn_bad_lines=False, low_memory=False)
+	df = df[["text"]].sample(frac=1).reset_index(drop=True)
+	vsCount = 0
+	for row in df.iterrows():
+		text = row[1][0]
+		nlp = spacy.load('en_core_web_lg')
+		comment = nlp(text)
+		svo = tuple(findSVOs(comment))
+		for i in range(len(svo)):
+			g.add_vertices(1)
+			g.vs[vsCount]["id"] = vsCount
+			g.vs[vsCount]["label"] = svo[i]
+			vsCount += 1
+	for v1 in g.vs:
+			for v2 in g.vs:
+				if(v1.index != v2.index):
+					if(type(v1["label"]) == str):
+						s1 = [v1["label"]]
+						o1 = [v1["label"]]
+					else:
+						s1 = str.split(v1["label"][0])
+						try:
+							o1 = str.split(v1["label"][2])
+						except:
+							o1 = str.split(v1["label"][1])
+					if (type(v2["label"]) == str):
+						s2 = v2["label"]
+						o2 = v2["label"]
+					else:
+						s2 = str.split(v2["label"][0])
+						try:
+							o2 = str.split(v2["label"][2])
+						except:
+							o2 = str.split(v2["label"][1])
 
+                    # Compare words in subject and object
+					for x in s1:
+						for y in s2:
+							if (x == y) and (x != "-pron-"):
+								g.add_edge(v1.index, v2.index)
+								break
+					for x in o1:
+						for y in o2:
+							if (x == y) and (x != "-pron-"):
+								g.add_edge(v1.index, v2.index)
+								break
+
+	weights = g.eigenvector_centrality()
+	g.vs['weight'] = weights
+	print(g)
+	visual_style = {}
+	visual_style["bbox"] = (1600, 1600)
+	visual_style["vertex_size"] = 20
+	visual_style["margin"] = 350
+	visual_style["vertex_label_size"] = 15
+	visual_style["layout"] = g.layout_circle()
+	plot(g, 'output.png', **visual_style)
 
 
 	
-# Automate Zoom Deployment [Later On]
+# Automate Zoom Deployment 
 def setup(id, pswd): 
 	# subprocess.call('C:\\myprogram.exe') [For Windows]
 	subprocess.call(["/usr/bin/open", "/Applications/zoom.us.app"]) 
-	time.sleep(3)
+	time.sleep(8)
 	x1, y1 = pyautogui.locateCenterOnScreen('join_btn_lrg.png')
 	pyautogui.moveTo(x1-650, y1-340)
 	pyautogui.click()
 	pyautogui.write(id)
 	pyautogui.press('enter') 
-	time.sleep(3)
+	time.sleep(4)
 	pyautogui.press('enter') 
 
 
@@ -126,6 +186,8 @@ def contains_conj(depSet):
     return "and" in depSet or "or" in depSet or "nor" in depSet or \
            "but" in depSet or "yet" in depSet or "so" in depSet or "for" in depSet
 
+
+# Get subs joined by conjunctions
 def _get_subs_from_conjunctions(subs):
     more_subs = []
     for sub in subs:
@@ -138,6 +200,8 @@ def _get_subs_from_conjunctions(subs):
                 more_subs.extend(_get_subs_from_conjunctions(more_subs))
     return more_subs
 
+
+# Get objects joined by conjunctions
 def _get_objs_from_conjunctions(objs):
     more_objs = []
     for obj in objs:
@@ -150,6 +214,8 @@ def _get_objs_from_conjunctions(objs):
                 more_objs.extend(_get_objs_from_conjunctions(more_objs))
     return more_objs
 
+
+# Find sub dependencies
 def _find_subs(tok):
     head = tok.head
     while head.pos_ != "VERB" and head.pos_ != "NOUN" and head.head != head:
@@ -166,6 +232,8 @@ def _find_subs(tok):
         return [head], _is_negated(tok)
     return [], False
 
+
+# Is the tok set's left or right negated?
 def _is_negated(tok):
     parts = list(tok.lefts) + list(tok.rights)
     for dep in parts:
@@ -174,6 +242,7 @@ def _is_negated(tok):
     return False
 
 
+# Get all the verbs on tokens with negation marker
 def _find_svs(tokens):
     svs = []
     verbs = [tok for tok in tokens if tok.pos_ == "VERB"]
@@ -185,16 +254,18 @@ def _find_svs(tokens):
     return svs
 
 
+# Get grammatical objects for a given set of dependencies (including passive sentences)
 def _get_objs_from_prepositions(deps, is_pas):
     objs = []
     for dep in deps:
         if dep.pos_ == "ADP" and (dep.dep_ == "prep" or (is_pas and dep.dep_ == "agent")):
-            objs.extend([tok for tok in dep.rights if tok.dep_  in OBJECTS or
+            objs.extend([tok for tok in dep.rights if tok.dep_ in OBJECTS or
                          (tok.pos_ == "PRON" and tok.lower_ == "me") or
                          (is_pas and tok.dep_ == 'pobj')])
     return objs
 
 
+# Get objects from the dependencies using the attribute dependency
 def _get_objs_from_attrs(deps, is_pas):
     for dep in deps:
         if dep.pos_ == "NOUN" and dep.dep_ == "attr":
@@ -209,6 +280,7 @@ def _get_objs_from_attrs(deps, is_pas):
     return None, None
 
 
+# Xcomp; open complement - verb has no suject
 def _get_obj_from_xcomp(deps, is_pas):
     for dep in deps:
         if dep.pos_ == "VERB" and dep.dep_ == "xcomp":
@@ -221,6 +293,7 @@ def _get_obj_from_xcomp(deps, is_pas):
     return None, None
 
 
+# Get all functional subjects adjacent to the verb passed in
 def _get_all_subs(v):
     verb_negated = _is_negated(v)
     subs = [tok for tok in v.lefts if tok.dep_ in SUBJECTS and tok.pos_ != "DET"]
@@ -232,6 +305,7 @@ def _get_all_subs(v):
     return subs, verb_negated
 
 
+# Find the main verb - or any aux verb if we can't find it
 def _find_verbs(tokens):
     verbs = [tok for tok in tokens if _is_non_aux_verb(tok)]
     if len(verbs) == 0:
@@ -239,14 +313,18 @@ def _find_verbs(tokens):
     return verbs
 
 
+# Is the token a verb?  (excluding auxiliary verbs)
 def _is_non_aux_verb(tok):
     return tok.pos_ == "VERB" and (tok.dep_ != "aux" and tok.dep_ != "auxpass")
 
 
+# Is the token a verb?  (excluding auxiliary verbs)
 def _is_verb(tok):
     return tok.pos_ == "VERB" or tok.pos_ == "AUX"
 
 
+# return the verb to the right of this verb in a CCONJ relationship if applicable
+# returns a tuple, first part True|False and second part the modified verb if True
 def _right_of_verb_is_conj_verb(v):
     # rights is a generator
     rights = list(v.rights)
@@ -260,6 +338,7 @@ def _right_of_verb_is_conj_verb(v):
     return False, v
 
 
+# get all objects for an active/passive sentence
 def _get_all_objs(v, is_pas):
     # rights is a generator
     rights = list(v.rights)
@@ -267,8 +346,8 @@ def _get_all_objs(v, is_pas):
     objs = [tok for tok in rights if tok.dep_ in OBJECTS or (is_pas and tok.dep_ == 'pobj')]
     objs.extend(_get_objs_from_prepositions(rights, is_pas))
 
-    #potentialNewVerb, potentialNewObjs = _get_objs_from_attrs(rights)
-    #if potentialNewVerb is not None and potentialNewObjs is not None and len(potentialNewObjs) > 0:
+    # potentialNewVerb, potentialNewObjs = _get_objs_from_attrs(rights)
+    # if potentialNewVerb is not None and potentialNewObjs is not None and len(potentialNewObjs) > 0:
     #    objs.extend(potentialNewObjs)
     #    v = potentialNewVerb
 
@@ -281,6 +360,7 @@ def _get_all_objs(v, is_pas):
     return v, objs
 
 
+# return true if the sentence is passive - at he moment a sentence is assumed passive if it has an auxpass verb
 def _is_passive(tokens):
     for tok in tokens:
         if tok.dep_ == "auxpass":
@@ -288,6 +368,7 @@ def _is_passive(tokens):
     return False
 
 
+# resolve a 'that' where/if appropriate
 def _get_that_resolution(toks):
     for tok in toks:
         if 'that' in [t.orth_ for t in tok.lefts]:
@@ -295,7 +376,7 @@ def _get_that_resolution(toks):
     return toks
 
 
-def _get_lemma(nlp, word: str):
+def _get_lemma(word: str):
     tokens = nlp(word)
     if len(tokens) == 1:
         return tokens[0].lemma_
@@ -304,13 +385,11 @@ def _get_lemma(nlp, word: str):
 
 def printDeps(toks):
     for tok in toks:
-        print(tok.orth_, tok.dep_, tok.pos_, tok.head.orth_, [t.orth_ for t in tok.lefts], [t.orth_ for t in tok.rights])
+        print(tok.orth_, tok.dep_, tok.pos_, tok.head.orth_, [t.orth_ for t in tok.lefts],
+              [t.orth_ for t in tok.rights])
 
-def removePunctuationCharacters(tokens:'list spacy tokens'):
-    not_punctuation_token = [token for token in tokens if not token.is_punct]
-    return not_punctuation_token
 
-def expand(item, tokens, visited, removepunctuation=False):
+def expand(item, tokens, visited):
     if item.lower_ == 'that':
         item = _get_that_resolution(tokens)
 
@@ -337,30 +416,23 @@ def expand(item, tokens, visited, removepunctuation=False):
             if item2.pos_ == "DET" or item2.pos_ == "NOUN":
                 if item2.i not in visited:
                     visited.add(item2.i)
-                    parts.extend(expand(item2, tokens, visited,removepunctuation))
+                    parts.extend(expand(item2, tokens, visited))
             break
 
-    if removepunctuation:
-        return removePunctuationCharacters(parts)
     return parts
 
 
 def to_str(tokens):
     if isinstance(tokens, Iterable):
-        return ' '.join([item.text for item in tokens])
+        try:
+            return ' '.join([item.lemma_.lower() for item in tokens])
+        except:
+            return ' '.join([item.text for item in tokens])
     else:
         return ''
 
-def uncontract(text:str):
-    return ContractText().uncontract(text)
 
-def findSVOs(nlp: "spacy doc", text:str,  removepunctuation=False, uncontracttext=False):
-    if uncontracttext:
-        text = uncontract(text)
-    tokens = nlp(text)
-    return _get_svos(tokens, removepunctuation)
-
-def _get_svos(tokens, removepunctuation=False):
+def findSVOs(tokens):
     svos = []
     is_pas = _is_passive(tokens)
     verbs = _find_verbs(tokens)
@@ -374,16 +446,20 @@ def _get_svos(tokens, removepunctuation=False):
                 for sub in subs:
                     for obj in objs:
                         objNegated = _is_negated(obj)
-                        if is_pas:  
-                            svos.append((to_str(expand(obj, tokens, visited, removepunctuation)),
-                                         "!" + v.lemma_ if verbNegated or objNegated else v.lemma_, to_str(expand(sub, tokens, visited, removepunctuation))))
-                            svos.append((to_str(expand(obj, tokens, visited, removepunctuation)),
-                                         "!" + v2.lemma_ if verbNegated or objNegated else v2.lemma_, to_str(expand(sub, tokens, visited, removepunctuation))))
+                        if is_pas:  # reverse object / subject for passive
+                            svos.append((to_str(expand(obj, tokens, visited)),
+                                         "!" + v.lemma_ if verbNegated or objNegated else v.lemma_,
+                                         to_str(expand(sub, tokens, visited))))
+                            svos.append((to_str(expand(obj, tokens, visited)),
+                                         "!" + v2.lemma_ if verbNegated or objNegated else v2.lemma_,
+                                         to_str(expand(sub, tokens, visited))))
                         else:
-                            svos.append((to_str(expand(sub, tokens, visited, removepunctuation)),
-                                         "!" + v.lower_ if verbNegated or objNegated else v.lower_, to_str(expand(obj, tokens, visited, removepunctuation))))
-                            svos.append((to_str(expand(sub, tokens, visited, removepunctuation)),
-                                         "!" + v2.lower_ if verbNegated or objNegated else v2.lower_, to_str(expand(obj, tokens, visited, removepunctuation))))
+                            svos.append((to_str(expand(sub, tokens, visited)),
+                                         "!" + v.lower_ if verbNegated or objNegated else v.lower_,
+                                         to_str(expand(obj, tokens, visited))))
+                            svos.append((to_str(expand(sub, tokens, visited)),
+                                         "!" + v2.lower_ if verbNegated or objNegated else v2.lower_,
+                                         to_str(expand(obj, tokens, visited))))
             else:
                 v, objs = _get_all_objs(v, is_pas)
                 for sub in subs:
@@ -391,13 +467,16 @@ def _get_svos(tokens, removepunctuation=False):
                         for obj in objs:
                             objNegated = _is_negated(obj)
                             if is_pas:  
-                                svos.append((to_str(expand(obj, tokens, visited, removepunctuation)),
-                                             "!" + v.lemma_ if verbNegated or objNegated else v.lemma_, to_str(expand(sub, tokens, visited, removepunctuation))))
+                                svos.append((to_str(expand(obj, tokens, visited)),
+                                             "!" + v.lemma_ if verbNegated or objNegated else v.lemma_,
+                                             to_str(expand(sub, tokens, visited))))
                             else:
-                                svos.append((to_str(expand(sub, tokens, visited, removepunctuation)),
-                                             "!" + v.lower_ if verbNegated or objNegated else v.lower_, to_str(expand(obj, tokens, visited, removepunctuation))))
-                        svos.append((to_str(expand(sub, tokens, visited, removepunctuation)),
-                                     "!" + v.lower_ if verbNegated else v.lower_, ''))
+                                svos.append((to_str(expand(sub, tokens, visited)),
+                                             "!" + v.lower_ if verbNegated or objNegated else v.lower_,
+                                             to_str(expand(obj, tokens, visited))))
+                    else:
+                        svos.append((to_str(expand(sub, tokens, visited)),
+                                     "!" + v.lower_ if verbNegated else v.lower_,))
 
     return svos
 
