@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 
-import JensenLogo from "../logo.png";
+import JensenLogo from "../images/logo.png";
 import { theme } from "../theme";
 
 const LogoContainer = styled.div`

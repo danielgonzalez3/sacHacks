@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { TopSection } from "./topSection";
-import { Margin } from "./components/margin";
+import { Margin } from "../components/margin";
 
 const PageContainer = styled.div`
   width: 100%;
