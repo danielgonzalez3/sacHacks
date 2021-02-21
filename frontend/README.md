@@ -2,6 +2,10 @@
 npm react-bootstrap
 npm install react-router-dom
 npm install styled-components
+npm install react-scroll
+npm i --save @fortawesome/free-solid-svg-icons
+npm install @fortawesome/fontawesome-svg-core
+npm install @fortawesome/react-fontawesome
 
 # Getting Started with Create React App
 

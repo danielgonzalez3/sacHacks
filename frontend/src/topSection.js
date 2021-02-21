@@ -1,66 +1,39 @@
 import React, { useState } from "react";
+import { Element, scroller } from "react-scroll";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+import { Button } from "./components/button";
 import "./topSection.css";
 import { LoginButton } from "./loginButton";
 import { Navbar } from "./components/navBar";
 import { Margin } from "./components/margin";
 import { Logo } from "./components/logo";
+import { DownArrow } from "./components/downArrow";
 
 
-export default function Login() {
-    {/* 
-        const [email, setEmail] = useState("");
-        const [password, setPassword] = useState("");
 
-        function validateForm() {
-            return email.length > 0 && password.length > 0;
-        }
-
-        function handleSubmit(event) {
-            event.preventDefault();
-        }
-    */}
-    
+export function TopSection(props) {
+    const scrollToNextSection = () => {
+        scroller.scrollTo("servicesSection", { smooth: true, duration: 1500 });
+    };
 
     return(
-        <div className = "topImageContainer" >
-            <div className = "imageFilter"> 
-                <Navbar />
-                <Margin direction="vertical" margin="8em" />
-                <Logo />
-                <Margin direction="vertical" margin="4em" />
-                <h1 className = "bigText"> Project Jensen </h1>
-                <h1 className = "bigText"> the Future of teaching software </h1>
-            </div>
-            {/*
-            <div className="Login">
-                <div className="centerLogin">
-                    <div className="box">
- 
-                    <Form onSubmit={handleSubmit}>
-                        <Form.Group size="lg" controlId="email">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                autoFocus
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group size="lg" controlId="password">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </Form.Group>
-                    </Form>
+        <Element name="topSection">
+            <div className = "topImageContainer" >
+                <div className = "imageFilter"> 
+                    <Navbar />
+                    <Margin direction="vertical" margin="8em" />
+                    <Logo />
+                    <Margin direction="vertical" margin="4em" />
+                    <h1 className = "bigText"> Project Jensen </h1>
+                    <h1 className = "bigText"> the Future of teaching software </h1>
+                    <Margin direction="vertical" margin="4em" />
+                    <Button>Better Teaching now.</Button>
+                    <div className = "downArrowContainer" onClick={scrollToNextSection}>
+                        <DownArrow/>
                     </div>
                 </div>
             </div>
-            */}
-        </div>
-    )
+        </Element>
+        
+    );
 }

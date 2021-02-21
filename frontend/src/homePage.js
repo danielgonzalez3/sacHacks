@@ -1,19 +1,22 @@
 import React from "react";
-import auth from "./auth";
+import styled from "styled-components";
+import { TopSection } from "./topSection";
+import { Margin } from "./components/margin";
 
-export const HomeLayout = props => {
-  return (
-    <div>
-      <h1>Home Layout</h1>
-      <button
-        onClick={() => {
-          auth.logout(() => {
-            props.history.push("/");
-          });
-        }}
-      >
-        Logout
-      </button>
-    </div>
-  );
-};
+const PageContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+export function Homepage(props) {
+    return (
+      <PageContainer>
+        <TopSection />
+        <Margin direction="vertical" margin="2em" />
+        <Margin direction="vertical" margin="8em" />
+      </PageContainer>
+    );
+  }
+  

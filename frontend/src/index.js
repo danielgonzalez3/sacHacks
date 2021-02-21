@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import App from './App';
 import Top from './topSection';
 import { HomeLayout } from "./homePage";
 import { ProtectedRoute } from "./protectedRoute";
+import { TopSection } from "./topSection";
 
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
@@ -33,8 +35,10 @@ ReactDOM.render(
 
 
 ReactDOM.render(
-      <Top />,  
-    document.getElementById('root')
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
 
