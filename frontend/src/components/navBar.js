@@ -14,7 +14,7 @@ export function Navbar(props){
             <div className = "buttonContainer">
                 <Button small> Get Started </Button>
                 <Margin direction="horizontal" margin="8px" />
-                <Button small className = "styledButton">Button</Button>
+                <Button small className = "styledButton">Login</Button>
             </div>
         </div>
     );
