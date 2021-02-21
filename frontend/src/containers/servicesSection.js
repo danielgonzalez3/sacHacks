@@ -22,7 +22,7 @@ const ServicesContainer = styled(Element)`
 export function ServicesSection(props) {
   return (
     <ServicesContainer name="servicesSection">
-      <SectionTitle>Best Quality Software</SectionTitle>
+      <SectionTitle>Bridge the Education Gap</SectionTitle>
       <Margin direction="vertical" margin="3em" />
       <OurSerivce
         title="Fully integrated services"
