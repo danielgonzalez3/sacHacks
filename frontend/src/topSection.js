@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import "./login.css";
+import "./topSection.css";
 import { LoginButton } from "./loginButton";
+import { Navbar } from "./components/navBar";
+import { Margin } from "./components/margin";
+import { Logo } from "./components/logo";
+
 
 export default function Login() {
     {/* 
@@ -22,6 +26,10 @@ export default function Login() {
     return(
         <div className = "topImageContainer" >
             <div className = "imageFilter"> 
+                <Navbar />
+                <Margin direction="vertical" margin="8em" />
+                <Logo />
+                <Margin direction="vertical" margin="4em" />
                 <h1 className = "bigText"> Project Jensen </h1>
                 <h1 className = "bigText"> the Future of teaching software </h1>
             </div>

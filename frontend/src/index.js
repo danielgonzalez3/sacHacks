@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Login from './login';
+import Top from './topSection';
 import { HomeLayout } from "./homePage";
 import { ProtectedRoute } from "./protectedRoute";
 
@@ -33,7 +33,7 @@ ReactDOM.render(
 
 
 ReactDOM.render(
-      <Login />,  
+      <Top />,  
     document.getElementById('root')
 );
 

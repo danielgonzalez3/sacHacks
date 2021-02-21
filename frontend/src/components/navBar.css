@@ -1,0 +1,24 @@
+.navBarContainer{
+    width: 100%;
+    height: 50px;
+    padding: 0 2em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.buttonContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+.styledButton{
+    background-color: transparent;
+    border: none;
+}
+
+.styledButton:hover {
+    background-color: transparent;
+    border: none;
+    color: rgb(212, 212, 212);
+}

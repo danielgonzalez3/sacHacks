@@ -1,7 +1,7 @@
 # npm installs
 npm react-bootstrap
-npm install --save react-chartjs-2 chart.js
 npm install react-router-dom
+npm install styled-components
 
 # Getting Started with Create React App
 
