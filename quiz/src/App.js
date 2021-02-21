@@ -1,67 +1,32 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from "react";
+import data from './data/data.json';
 
 export default function App() {
     //this creates garbage variable i
     let i;
     // This initialises a request to the trivia database API
-    var xmlhttp = new XMLHttpRequest();
     const url = "https://opentdb.com/api.php?amount=50&category=23&difficulty=medium&type=multiple";
     var question;
     var type;
     var correctAnswer;
-    var fjsondata = 54;
-    var jsondata = {results: new Array([54], [32], [45], [234], [234], [345], [45])};
     var incorrect1;
     var incorrect2;
     var incorrect3;
+    console.log(data);
 
-// This requests the data
-    var getJSON = function (url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'json';
-        xhr.onload = function () {
-            var status = xhr.status;
-            if (status === 200) {
-                callback(null, xhr.response);
-            } else {
-                callback(status, xhr.response);
-            }
-        };
-        xhr.send();
-    };
-    getJSON(url,
-        function (err, data) {
-            if (err !== null) {
-                alert('Something went wrong: ' + err);
-            } else {
-            }
-            console.log(data);
-        });
-
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            jsondata = JSON.parse(this.responseText);
-            getData(jsondata);
-        } else {
-            throw '';
-        }
-    };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
 
     // This function is used to extract the received data
-    function getData(data) {
+    function getData(input) {
         // This is the question:
-        question = data.results[0].question;
+        question = data.results[input].question;
         // This is the question type eg. multiple choice
-        type = data.results[0].type;
+        type = data.results[input].type;
         // This is the correct answer
-        correctAnswer = data.results[0].correct_answer;
+        correctAnswer = data.results[input].correct_answer;
         // These are the three incorrect answers
-        incorrect1 = data.results[0].incorrect_answers[0];
-        incorrect2 = data.results[0].incorrect_answers[1];
-        incorrect3 = data.results[0].incorrect_answers[2];
+        incorrect1 = data.results[input].incorrect_answers[0];
+        incorrect2 = data.results[input].incorrect_answers[1];
+        incorrect3 = data.results[input].incorrect_answers[2];
 
         // randomly select answer and other options and place in array
         // then display elements from array on the buttons
@@ -84,63 +49,149 @@ export default function App() {
 
 
         var options = [];
-        console.log(randoms);
         options[randoms[0]] = correctAnswer;
         options[randoms[1]] = incorrect1;
         options[randoms[2]] = incorrect2;
         options[randoms[3]] = incorrect3;
-
         console.log(options);
+        return options;
+
+
     }
 
+    var numbers = []; // an array to store unique random numbers
+    var numberinos;
+
+    // loop runs four times...
+    for (i = 0; i < 5; i++) {
+        // generates a random number between 0 and 48
+        numberinos = Math.floor(Math.random() * 48);
+        // checks if random number already in array...
+        while (numbers.includes(numberinos)) {
+            // generates another random number
+            numberinos = Math.floor(Math.random() * 48);
+        }
+        // adds random number to array
+        numbers.push(numberinos);
+    }
+    console.log(numbers);
+    var question1 = getData(numbers[0])
+    var question2 = getData(numbers[1])
+    var question3 = getData(numbers[2])
+    var question4 = getData(numbers[3])
+    var question5 = getData(numbers[4])
+
+    console.log(
+        question1 = getData(numbers[0])
+    )
+    ;
     const questions = [
         {
-            questionText: 'helo world',
+            questionText: data.results[numbers[0]].question,
             answerOptions: [
-                {answerText: 'New York', isCorrect: false},
-                {answerText: 'London', isCorrect: false},
-                {answerText: 'Paris', isCorrect: true},
-                {answerText: 'Dublin', isCorrect: false},
+                {
+                    answerText: question1[0],
+                    isCorrect: question1[0] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question1[1],
+                    isCorrect: question1[1] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question1[2],
+                    isCorrect: question1[2] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question1[3],
+                    isCorrect: question1[3] === data.results[numbers[0]].correct_answer
+                },
             ],
         },
         {
-            questionText: 'What is the capital of France?',
+            questionText: data.results[numbers[0]].question,
             answerOptions: [
-                {answerText: 'New York', isCorrect: false},
-                {answerText: 'London', isCorrect: false},
-                {answerText: 'Paris', isCorrect: true},
-                {answerText: 'Dublin', isCorrect: false},
+                {
+                    answerText: question2[0],
+                    isCorrect: question2[0] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question2[1],
+                    isCorrect: question2[1] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question2[2],
+                    isCorrect: question2[2] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question2[3],
+                    isCorrect: question2[3] === data.results[numbers[0]].correct_answer
+                },
             ],
         },
         {
-            questionText: 'Who is CEO of Tesla?',
+            questionText: data.results[numbers[0]].question,
             answerOptions: [
-                {answerText: 'Jeff Bezos', isCorrect: false},
-                {answerText: 'Elon Musk', isCorrect: true},
-                {answerText: 'Bill Gates', isCorrect: false},
-                {answerText: 'Tony Stark', isCorrect: false},
+                {
+                    answerText: question3[0],
+                    isCorrect: question3[0] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question3[1],
+                    isCorrect: question3[1] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question3[2],
+                    isCorrect: question3[2] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question3[3],
+                    isCorrect: question3[3] === data.results[numbers[0]].correct_answer
+                },
             ],
         },
         {
-            questionText: 'The iPhone was created by which company?',
+            questionText: data.results[numbers[0]].question,
             answerOptions: [
-                {answerText: 'Apple', isCorrect: true},
-                {answerText: 'Intel', isCorrect: false},
-                {answerText: 'Amazon', isCorrect: false},
-                {answerText: 'Microsoft', isCorrect: false},
+                {
+                    answerText: question4[0],
+                    isCorrect: question4[0] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question4[1],
+                    isCorrect: question4[1] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question4[2],
+                    isCorrect: question4[2] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question4[3],
+                    isCorrect: question4[3] === data.results[numbers[0]].correct_answer
+                },
             ],
         },
         {
-            questionText: 'How many Harry Potter books are there?',
+            questionText: data.results[numbers[0]].question,
             answerOptions: [
-                {answerText: '1', isCorrect: false},
-                {answerText: '4', isCorrect: false},
-                {answerText: '6', isCorrect: false},
-                {answerText: '7', isCorrect: true},
+                {
+                    answerText: question5[0],
+                    isCorrect: question5[0] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question5[1],
+                    isCorrect: question5[1] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question5[2],
+                    isCorrect: question5[2] === data.results[numbers[0]].correct_answer
+                },
+                {
+                    answerText: question5[3],
+                    isCorrect: question5[3] === data.results[numbers[0]].correct_answer
+                },
             ],
         },
     ];
-    questions[0].questionText = jsondata.results[0]
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [showScore, setShowScore] = useState(false);
